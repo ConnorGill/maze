@@ -261,3 +261,13 @@ extern int getCol(CELL* c)
 {
   return c->col;
 }
+
+/*extern CELL * updateIndex(CELL* c, char direction, int curRow, int curCol)
+{
+  if(direction == 't') { curRow--; }
+  else if(direction == 'l') { curCol--; }
+  else if(direction == 'r') { curCol++; }
+  else if(direction == 'b') { curRow++; }
+
+  return
+}*/
