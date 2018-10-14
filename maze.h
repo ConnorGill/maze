@@ -8,10 +8,10 @@
 
     extern MAZE *newMAZE(void);
 
-    extern int createMaze(MAZE* m, int rows, int cols, char* mazeFile);
-    extern int buildMaze(MAZE* m);
+    extern void createMaze(MAZE* m, int rows, int cols, char* mazeFile);
+    extern void buildMaze(MAZE* m);
     extern int solveMaze(MAZE* m, char* mazeFile, char* solvedFile);
-    extern int drawMaze(MAZE* m, char* drawFile);
+    extern void drawMaze(MAZE* m, char* drawFile);
     extern CELL* updateIndex(MAZE* m, char direction);
 
 

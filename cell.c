@@ -15,7 +15,7 @@ struct cell //typedef outside of func?
 {
   int row;
   int col;
-  int val;
+  int stepNumber;
   int rWall;
   int bWall;
   int bors[4]; //nieghbors of each cell [L/0, T/1, R/2, B/3]
@@ -29,7 +29,7 @@ extern CELL   *newCELL(void)
   CELL * cellStruct = malloc(sizeof(CELL));  //allocates struct
   cellStruct->row = 0;
   cellStruct->col = 0;
-  cellStruct->val = 0;
+  cellStruct->stepNumber = 0;
   cellStruct->rWall = 1;
   cellStruct->bWall = 1;
   cellStruct->visited = 0;
@@ -164,6 +164,7 @@ extern char chooseBor(CELL* c)
   else
   {
     int index = random() % c->numBors;
+    printf("RAND INDEX: %d | BORS#: %d\n", index, c->numBors);
     char chosen = c->bors2[index];
     //printf("Rand Index: %d = %c\n", index, chosen);
     return chosen;
@@ -192,7 +193,7 @@ extern void setcurrCell(CELL* curr, char direction)
 {
   curr->visited = 1;
   //printf("curr Bors = %d\n", curr->numBors);
-  //printf("currBORS1[%d] = [%c,%c,%c,%c]\n",curr->numBors,curr->bors2[0],curr->bors2[1],curr->bors2[2],curr->bors2[3]);
+  printf("currBORS1[%d] = [%c,%c,%c,%c]\n",curr->numBors,curr->bors2[0],curr->bors2[1],curr->bors2[2],curr->bors2[3]);
 
   for (int i = 0; i < 4; i++)
   {
@@ -210,7 +211,7 @@ extern void setcurrCell(CELL* curr, char direction)
   {
       curr->numBors--;
   }
-  //printf("currBORS2[%d] = [%c,%c,%c,%c]\n",curr->numBors, curr->bors2[0],curr->bors2[1],curr->bors2[2],curr->bors2[3]);
+  printf("currBORS2[%d] = [%c,%c,%c,%c]\n",curr->numBors, curr->bors2[0],curr->bors2[1],curr->bors2[2],curr->bors2[3]);
 
 
 }
@@ -225,7 +226,7 @@ extern void setnextCell(CELL* next, char direction)
   else if(direction == 'r') {opposite = 'l';}
   else if(direction == 'b') {opposite = 't';}
 
-  //printf("nextBORS1[%d] = [%c,%c,%c,%c]\n",next->numBors, next->bors2[0],next->bors2[1],next->bors2[2],next->bors2[3]);
+  printf("nextBORS1[%d] = [%c,%c,%c,%c]\n",next->numBors, next->bors2[0],next->bors2[1],next->bors2[2],next->bors2[3]);
   for (int i = 0; i < 4; i++)
   {
     if(next->bors2[i] == opposite)
@@ -244,7 +245,7 @@ extern void setnextCell(CELL* next, char direction)
   }
 
 
-  //printf("nextBORS2[%d] = [%c,%c,%c,%c]\n",next->numBors,next->bors2[0],next->bors2[1],next->bors2[2],next->bors2[3]);
+  printf("nextBORS2[%d] = [%c,%c,%c,%c]\n",next->numBors,next->bors2[0],next->bors2[1],next->bors2[2],next->bors2[3]);
 }
 
 extern int beenVisited(CELL* c)

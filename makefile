@@ -50,7 +50,7 @@ test : maze #da stack cda queue
 	#./cda
 	#./stack
 	#./queue
-	./amaze -r 5 -c 3 3 file.maze -d drawnfile.name
+	./amaze -r 2 -c 10 10 file.maze -d drawn.file
 valgrind : maze #da stack cda queue
 	#valgrind --leak-check=full ./da
 	#valgrind --leak-check=full ./cda

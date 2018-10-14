@@ -35,7 +35,7 @@ extern MAZE   *newMAZE(void)
 
 
 //func for creatiing maze, setting cells
-extern int createMaze(MAZE* m, int rows, int cols, char* mazeFile)
+extern void createMaze(MAZE* m, int rows, int cols, char* mazeFile)
 {
   //CREATE cellsArr 2D Array
   m->rows = rows;
@@ -54,35 +54,32 @@ extern int createMaze(MAZE* m, int rows, int cols, char* mazeFile)
      }
    }
    buildMaze(m);
-   //testBor(m->cellsArr[0][0]);
 
-  return 0;
+   FILE * outFileM;
+   outFileM = fopen(mazeFile, "w");
+   fprintf(outFileM, "TEMP\n");
+   //testBor(m->cellsArr[0][0]);
+   fclose(outFileM);
 }
 
 //determines path of maze
-extern int buildMaze(MAZE* m)
+extern void buildMaze(MAZE* m)
 {
   printf("buildMaze\n");
-  //int curRow = 0;
-  //int curCol = 0;
 
   STACK * visited = newSTACK();
   CELL * currCell = m->cellsArr[0][0];
   char chosenBor;
   char tempBor;
-  int tempRow = 0;
-  int tempCol = 0;
 
   push(visited, currCell);  //first cell into stack
 
-  //chosenBor = chooseBor(currCell);
-  //printf("CHOSEN: %c\n", chosenBor);
   while (sizeSTACK(visited) != 0) //FIXME: A TIE?!?
   {
 
       currCell = (CELL *)peekSTACK(visited);    //set curr to top stack
       setVisit(currCell); //set curr as been visited
-      m->curRow = getRow(currCell);
+      m->curRow = getRow(currCell); //update index location
       m->curCol = getCol(currCell);
 
       int count = 0;  //track index of nieghbors
@@ -94,20 +91,13 @@ extern int buildMaze(MAZE* m)
           count++;
 
           //printf("TEMPBOR: %c\n", tempBor);
-          tempRow = m->curRow;
-          tempCol = m->curCol;
           if (tempBor == ' ') //if empty, break loop
           {
             break;
           }
-          //else if(tempBor == 't') { tempRow = tempRow-1; }
-          //else if(tempBor == 'l') { tempCol = tempCol-1; }
-          //else if(tempBor == 'r') { tempCol = tempCol+1; }
-          //else if(tempBor == 'b') { tempRow = tempRow+1; }
-          //else {break;}
-          //printf("ADJACENT %c -> [%d][%d]\n",tempBor, tempRow, tempCol);
-          //CELL * tempCell = m->cellsArr[tempRow][tempCol];
+
           CELL * tempCell = updateIndex(m, tempBor);
+          printf("ADJACENT %c -> [%d][%d]\n",tempBor, getRow(tempCell), getCol(tempCell));
           if (beenVisited(tempCell) == 1) //if next cell have been visited
           {
             count = 0;
@@ -121,15 +111,10 @@ extern int buildMaze(MAZE* m)
       printf("CURCOL: %d | ", m->curCol);
       printf("CHOSENBOR: %c", chosenBor);
       printf(" | # BORS: %d\n",getnumBors(currCell) );
-      //if(chosenBor == 't') { m->curRow--; }
-      //else if(chosenBor == 'l') { m->curCol--; }
-      //else if(chosenBor == 'r') { m->curCol++; }
-      //else if(chosenBor == 'b') { m->curRow++; }
 
-      //CELL * nextCell = m->cellsArr[m->curRow][m->curCol];
       CELL * nextCell = updateIndex(m, chosenBor);
 
-      if (chooseBor(currCell) == '!') //if no nieghbors
+      if (chosenBor == '!') //if no nieghbors
       {
         //printf("CELL VISITS: %d\n", beenVisited(nextCell));
         pop(visited);
@@ -140,34 +125,26 @@ extern int buildMaze(MAZE* m)
       {
         if (chosenBor == 't')
         {
-          printf("nextBWALL BEFORE[%d][%d]: %d\n", m->curRow, m->curCol, getbWall(nextCell));
           removebWall(nextCell);
-          printf("nextBWALL AFTER[%d][%d]: %d\n", m->curRow, m->curCol, getbWall(nextCell));
           setcurrCell(currCell, chosenBor);
           setnextCell(nextCell, chosenBor);
          }
         else if (chosenBor == 'b')
         {
-          printf("currBWALL BEFORE[%d][%d]: %d\n", m->curRow-1, m->curCol, getbWall(currCell));
           removebWall(currCell);
-          printf("currBWALL AFTER[%d][%d]: %d\n", m->curRow-1, m->curCol, getbWall(currCell));
           setcurrCell(currCell, chosenBor);
           setnextCell(nextCell, chosenBor);
 
         }
         else if (chosenBor == 'l')
         {
-          printf("nextRWALL BEFORE[%d][%d]: %d\n", m->curRow, m->curCol, getrWall(nextCell));
           removerWall(nextCell);
-          printf("nextRWALL AFTER[%d][%d]: %d\n", m->curRow, m->curCol, getrWall(nextCell));
           setcurrCell(currCell, chosenBor);
           setnextCell(nextCell, chosenBor);
         }
         else if (chosenBor == 'r')
         {
-          printf("currRWALL BEFORE[%d][%d]: %d\n", m->curRow, m->curCol-1, getrWall(currCell));
           removerWall(currCell);
-          printf("currRWALL AFTER[%d][%d]: %d\n", m->curRow, m->curCol-1, getrWall(currCell));
           setcurrCell(currCell, chosenBor);
           setnextCell(nextCell, chosenBor);
         }
@@ -177,7 +154,6 @@ extern int buildMaze(MAZE* m)
 
   }
   freeSTACK(visited);
-  return 0;
 }
 
 extern CELL* updateIndex(MAZE* m, char direction)
@@ -194,15 +170,14 @@ extern CELL* updateIndex(MAZE* m, char direction)
 
 extern int solveMaze(MAZE* m, char* mazeFile, char* solvedFile)
 {
-  printf("solveMaze\n");
-  printf("mazeFile: %s\n", mazeFile);
-  printf("solvedFile: %s\n", solvedFile);
-  printf("rows: %d\n", m->rows);
+
   return 0;
 }
 
-extern int drawMaze(MAZE* m, char* drawFile)
+extern void drawMaze(MAZE* m, char* drawFile)
 {
+  FILE * outFile;
+  outFile = fopen(drawFile, "w");
 
   int numDash = (m->cols * 4) + 1;  //dashes in a row
   char midline[numDash];
@@ -211,9 +186,9 @@ extern int drawMaze(MAZE* m, char* drawFile)
 
   for (int z = 0; z < numDash; z++)
   {
-    printf("-");  //top wall
+    fprintf(outFile, "-");  //top wall
   }
-  printf("\n");
+  fprintf(outFile,"\n");
 
   for (int i = 0; i < m->rows; i++) //for rows
   {
@@ -224,11 +199,11 @@ extern int drawMaze(MAZE* m, char* drawFile)
 
     if (i == 0) //if entrance to maze
     {
-      printf(" "); //left wall
+      fprintf(outFile, " "); //left wall
     }
     else
     {
-      printf("|");  //left wall
+      fprintf(outFile, "|");  //left wall
     }
     lineIndex = 1;
     for(int j = 0; j < m->cols; j++) //for cols
@@ -237,11 +212,11 @@ extern int drawMaze(MAZE* m, char* drawFile)
       //printf("BWALL AT[%d][%d] = %d\n", i, j, getbWall(currCell));
       if (getrWall(currCell) == 1) //rWall exists
       {
-        printf(" %d |", j);
+        fprintf(outFile, "   |");
       }
       else if (getrWall(currCell) == 0) //no rWall
       {
-        printf(" %d  ", j);
+        fprintf(outFile, "    ");
       }
       if (getbWall(currCell) == 0) //remove bottom wall
       {
@@ -256,14 +231,13 @@ extern int drawMaze(MAZE* m, char* drawFile)
         lineIndex = lineIndex + 4;
       }
     }
-    printf("\n");
+    fprintf(outFile, "\n");
     for (int x = 0; x < numDash; x++)
     {
-      printf("%c", midline[x]);
+      fprintf(outFile, "%c", midline[x]);
     }
-    printf("\n");
+    fprintf(outFile, "\n");
 
   }
-
-  return 0;
+  fclose(outFile);
 }
