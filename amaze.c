@@ -13,9 +13,61 @@ int main(int argc,char **argv)
 {
   MAZE *m = newMAZE();
 
+  char *mazeFile;
+  char *solvedFile;
+  char *drawFile;
+  int rows = 0;
+  int cols = 0;
+  int userSeed = 0;
+  int name = 0;
+  int create = 0;
+  int solve = 0;
+  int draw = 0;
+
   if (argc == 1) Fatal("%d arguments!\n",argc-1);
 
-  ProcessOptions(m,argc,argv);
+  for (int i = 1; i < argc; ++i)
+  {
+    if (strcmp(argv[i], "-r") == 0)
+    {
+      userSeed = atoi(argv[i + 1]);
+      setSeed(userSeed);
+    }
+
+    if (strcmp(argv[i], "-v") == 0) { name = i; }
+    if (strcmp(argv[i], "-c") == 0) { create = i; }
+    if (strcmp(argv[i], "-s") == 0) { solve = i; }
+    if (strcmp(argv[i], "-d") == 0) { draw = i; }
+  }
+
+  if (name)
+  {
+    printf("Connor Gill\n");
+  }
+  if (create)
+  {
+    rows = atoi(argv[create + 1]);
+    cols = atoi(argv[create + 2]);
+    mazeFile = argv[create + 3];
+    createMaze(m, rows, cols);
+    mazetoFile(m, mazeFile); //store maze info in file
+  }
+  if (solve)
+  {
+    mazeFile = argv[solve + 1];
+    solvedFile = argv[solve + 2];
+    MAZE * m1 = mazefromFile(mazeFile);
+    solveMaze(m1);
+    mazetoFile(m1, solvedFile);
+  }
+  if (draw)
+  {
+    drawFile = argv[draw + 1];
+    MAZE * m2 = mazefromFile(drawFile);
+    drawMaze(m2);
+  }
+
+  //ProcessOptions(m,argc,argv);
 
   return 0;
 }
@@ -71,34 +123,6 @@ extern int ProcessOptions(MAZE* m, int argc, char **argv)
 
         switch (argv[start][1])
             {
-            /*
-             * when option has an argument, do this
-             *
-             *     examples are -m4096 or -m 4096
-             *
-             *     case 'm':
-             *         MemorySize = atol(arg);
-             *         argsUsed = 1;
-             *         break;
-             *
-             * when option has multiple arguments, do this
-             *
-             *     examples are -r4096 1280 or -r 4096 1280
-             *
-             *     case 'r':
-             *         Rows = atoi(arg);
-             *         Cols = atoi(argv[argIndex+1]);
-             *         argsUsed = 2;
-             *         break;
-             *
-             * when option does not have an argument, do this
-             *
-             *     example is -a
-             *
-             *     case 'a':
-             *         PrintActions = 1;
-             *         break;
-             */
 
             case 'v':    //give author's name
                 printf("Connor Gill\n");
@@ -110,18 +134,22 @@ extern int ProcessOptions(MAZE* m, int argc, char **argv)
                 cols = atoi(argv[argIndex+1]);
                 mazeFile = argv[argIndex+2];
                 argsUsed = 3;
-                createMaze(m, rows, cols, mazeFile);
+                createMaze(m, rows, cols);
+                mazetoFile(m, mazeFile); //store maze info in file
                 break;
             case 's':    //solve maze
                 mazeFile = arg;
                 solvedFile = argv[argIndex+1];
                 argsUsed = 2;
-                solveMaze(m, mazeFile, solvedFile);
+                MAZE * m1 = mazefromFile(mazeFile);
+                //solveMaze(m1);
+                mazetoFile(m1, solvedFile);
                 break;
             case 'd':   //draw maze
                 drawFile = arg;
                 argsUsed = 1;
-                drawMaze(m, drawFile);
+                MAZE * m2 = mazefromFile(drawFile);
+                drawMaze(m2);
                 break;
             case 'r':    //seed random number
                 userSeed = atoi(arg);
@@ -135,6 +163,8 @@ extern int ProcessOptions(MAZE* m, int argc, char **argv)
 
         argIndex += argsUsed;
         }
+
+
 
     return argIndex;
 }

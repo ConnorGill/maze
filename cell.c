@@ -15,12 +15,12 @@ struct cell //typedef outside of func?
 {
   int row;
   int col;
-  int stepNumber;
+  int stepNum;
   int rWall;
   int bWall;
-  int bors[4]; //nieghbors of each cell [L/0, T/1, R/2, B/3]
   int numBors;
-  char bors2[4];
+  char bors[4];
+  char openBors[4];
   int visited;
 };
 
@@ -29,15 +29,15 @@ extern CELL   *newCELL(void)
   CELL * cellStruct = malloc(sizeof(CELL));  //allocates struct
   cellStruct->row = 0;
   cellStruct->col = 0;
-  cellStruct->stepNumber = 0;
+  cellStruct->stepNum = 0;
   cellStruct->rWall = 1;
   cellStruct->bWall = 1;
   cellStruct->visited = 0;
 
   for (int i = 0; i < 4; i++)   //Default to no neighbors
   {
-      cellStruct->bors[i] = 0;
-      cellStruct->bors2[i] = ' ';
+      cellStruct->bors[i] = ' ';
+      cellStruct->openBors[i] = ' ';
   }
   return cellStruct;
 }
@@ -54,71 +54,71 @@ extern int setcellProps(CELL* c, int row, int col, int totRows, int totCols)
   //Determining which nieghbors exists
   if (row == 0 && col == 0)   //top left  0,0
   {
-    c->bors2[0] = 'r'; //right
-    c->bors2[1] = 'b'; //bottom
+    c->bors[0] = 'r'; //right
+    c->bors[1] = 'b'; //bottom
     c->visited = 1;
     c->numBors = 2;
 
   }
   else if(row == 0 && col == lastCol) //top right, 0, lastCol
   {
-    c->bors2[0] = 'l'; //Left
-    c->bors2[1] = 'b'; //bottom
+    c->bors[0] = 'l'; //Left
+    c->bors[1] = 'b'; //bottom
 
     c->numBors = 2;
   }
   else if(row == lastRow && col == 0) //bottom left, 0, lastCol
   {
-    c->bors2[0] = 't'; //top
-    c->bors2[1] = 'r'; //right
+    c->bors[0] = 't'; //top
+    c->bors[1] = 'r'; //right
 
     c->numBors = 2;
   }
   else if(row == lastRow && col == lastCol) //bottom right, 0, lastCol
   {
-    c->bors2[0] = 't'; //top
-    c->bors2[1] = 'l'; //left
+    c->bors[0] = 't'; //top
+    c->bors[1] = 'l'; //left
     c->numBors = 2;
     c->rWall = 0; //Maze exit
   }
   else if (row == 0)  //top row, not corner
   {
-    c->bors2[0] = 'l'; //left
-    c->bors2[1] = 'r'; //right
-    c->bors2[2] = 'b'; //bottom
+    c->bors[0] = 'l'; //left
+    c->bors[1] = 'r'; //right
+    c->bors[2] = 'b'; //bottom
 
     c->numBors = 3;
   }
   else if (row == lastRow)  //bottom row, not corner
   {
-    c->bors2[0] = 't'; //top
-    c->bors2[1] = 'l'; //left
-    c->bors2[2] = 'r'; //right
+    c->bors[0] = 't'; //top
+    c->bors[1] = 'l'; //left
+    c->bors[2] = 'r'; //right
 
     c->numBors = 3;
   }
   else if (col == 0)  //bottom row, not corner
   {
-    c->bors2[0] = 't'; //top
-    c->bors2[1] = 'r'; //bottom
-    c->bors2[2] = 'b'; //right
+    c->bors[0] = 't'; //top
+    c->bors[1] = 'r'; //bottom
+    c->bors[2] = 'b'; //right
 
     c->numBors = 3;
   }
   else if (col == lastCol)  //bottom row, not corner
   {
-    c->bors2[0] = 't'; //top
-    c->bors2[1] = 'l'; //left
-    c->bors2[2] = 'b'; //bottom
+    c->bors[0] = 't'; //top
+    c->bors[1] = 'l'; //left
+    c->bors[2] = 'b'; //bottom
 
     c->numBors = 3;
   }
   else
   {
-    c->bors2[0] = 't'; //top
-    c->bors2[1] = 'l'; //left
-    c->bors2[2] = 'r'; //right
-    c->bors2[3] = 'b'; //bottom
+    c->bors[0] = 't'; //top
+    c->bors[1] = 'l'; //left
+    c->bors[2] = 'r'; //right
+    c->bors[3] = 'b'; //bottom
 
     c->numBors = 4;
   }
@@ -128,8 +128,7 @@ extern int setcellProps(CELL* c, int row, int col, int totRows, int totCols)
 
 extern int testBor(CELL* c)
 {
-  printf("row: %d | col: %d\n",c->row, c->col );
-  printf("curCell numBors: %d\n" , c->numBors);
+  printf("openBORS2[%d][%d] = [%c,%c,%c,%c]\n",c->row, c->col, c->openBors[0],c->openBors[1],c->openBors[2],c->openBors[3]);
   return 0;
 }
 
@@ -153,6 +152,11 @@ extern void removebWall(CELL* c)
   c->bWall = 0;
 }
 
+extern int getstepNum(CELL* c)
+{
+  return c->stepNum;
+}
+
 extern void setSeed(int userSeed)
 {
   srandom(userSeed);
@@ -164,8 +168,8 @@ extern char chooseBor(CELL* c)
   else
   {
     int index = random() % c->numBors;
-    printf("RAND INDEX: %d | BORS#: %d\n", index, c->numBors);
-    char chosen = c->bors2[index];
+    //printf("RAND INDEX: %d | BORS#: %d\n", index, c->numBors);
+    char chosen = c->bors[index];
     //printf("Rand Index: %d = %c\n", index, chosen);
     return chosen;
   }
@@ -175,8 +179,8 @@ extern char chooseBor(CELL* c)
 extern char getBor(CELL* c, int i)
 {
   //printf("Rand Index: %d = %c\n", index, chosen);
-  //printf("getBORS TEST[%d] = [%c,%c,%c,%c]\n",c->numBors,c->bors2[0],c->bors2[1],c->bors2[2],c->bors2[3]);
-  return c->bors2[i];
+  //printf("getBORS TEST[%d] = [%c,%c,%c,%c]\n",c->numBors,c->bors[0],c->bors[1],c->bors[2],c->bors[3]);
+  return c->bors[i];
 }
 
 extern char getnumBors(CELL* c)
@@ -193,27 +197,25 @@ extern void setcurrCell(CELL* curr, char direction)
 {
   curr->visited = 1;
   //printf("curr Bors = %d\n", curr->numBors);
-  printf("currBORS1[%d] = [%c,%c,%c,%c]\n",curr->numBors,curr->bors2[0],curr->bors2[1],curr->bors2[2],curr->bors2[3]);
+  //printf("currBORS1[%d] = [%c,%c,%c,%c]\n",curr->numBors,curr->bors[0],curr->bors[1],curr->bors[2],curr->bors[3]);
 
-  for (int i = 0; i < 4; i++)
+  for (int i = 0; i < 4; i++) //update bors array
   {
-    if(curr->bors2[i] == direction)
+    if(curr->bors[i] == direction)
     {
-      curr->bors2[i] = ' ';
+      curr->bors[i] = ' ';
       for(int k = i; k <  3; k++) //shift
       {
-        curr->bors2[k] = curr->bors2[k+1];
+        curr->bors[k] = curr->bors[k+1];
       }
-      curr->bors2[3] = ' ';
+      curr->bors[3] = ' ';
     }
   }
   if (curr->numBors > 0)
   {
       curr->numBors--;
   }
-  printf("currBORS2[%d] = [%c,%c,%c,%c]\n",curr->numBors, curr->bors2[0],curr->bors2[1],curr->bors2[2],curr->bors2[3]);
-
-
+  //printf("currBORS2[%d] = [%c,%c,%c,%c]\n",curr->numBors, curr->bors[0],curr->bors[1],curr->bors[2],curr->bors[3]);
 }
 
 extern void setnextCell(CELL* next, char direction)
@@ -226,29 +228,59 @@ extern void setnextCell(CELL* next, char direction)
   else if(direction == 'r') {opposite = 'l';}
   else if(direction == 'b') {opposite = 't';}
 
-  printf("nextBORS1[%d] = [%c,%c,%c,%c]\n",next->numBors, next->bors2[0],next->bors2[1],next->bors2[2],next->bors2[3]);
+  //printf("nextBORS1[%d] = [%c,%c,%c,%c]\n",next->numBors, next->bors[0],next->bors[1],next->bors[2],next->bors[3]);
   for (int i = 0; i < 4; i++)
   {
-    if(next->bors2[i] == opposite)
+    if(next->bors[i] == opposite)
     {
-      next->bors2[i] = ' ';
+      next->bors[i] = ' ';
       if (next->numBors > 0)
       {
           next->numBors--;
       }
       for(int k = i; k <  3; k++)
       {
-        next->bors2[k] = next->bors2[k+1];
+        next->bors[k] = next->bors[k+1];
       }
-      next->bors2[3] = ' ';
+      next->bors[3] = ' ';
     }
   }
-
-
-  printf("nextBORS2[%d] = [%c,%c,%c,%c]\n",next->numBors,next->bors2[0],next->bors2[1],next->bors2[2],next->bors2[3]);
+  //printf("nextBORS2[%d] = [%c,%c,%c,%c]\n",next->numBors,next->bors[0],next->bors[1],next->bors[2],next->bors[3]);
 }
 
-extern int beenVisited(CELL* c)
+extern void setopenBors(CELL* c, char direction)
+{
+  //printf("openBORS1[%d][%d] = [%c,%c,%c,%c]\n", c->row, c->col, c->openBors[0],c->openBors[1],c->openBors[2],c->openBors[3]);
+  for (int i = 0; i < 4; i++)
+  {
+    if(direction == 't')
+    {
+      c->openBors[0] = 't';
+    }
+    else if(direction == 'l')
+    {
+      c->openBors[1] = 'l';
+    }
+    else if(direction == 'r')
+    {
+      c->openBors[2] = 'r';
+    }
+    else if(direction == 'b')
+    {
+      c->openBors[3] = 'b';
+    }
+  }
+  //printf("openBORS2[%d][%d] = [%c,%c,%c,%c]\n",c->row, c->col, c->openBors[0],c->openBors[1],c->openBors[2],c->openBors[3]);
+}
+
+extern char getopenBor(CELL* c, int index)
+{
+  return c->openBors[index];
+}
+
+
+
+extern int getVisited(CELL* c)
 {
   return c->visited;
 }
@@ -263,12 +295,27 @@ extern int getCol(CELL* c)
   return c->col;
 }
 
-/*extern CELL * updateIndex(CELL* c, char direction, int curRow, int curCol)
+extern void setrWall(CELL* c, int val)
 {
-  if(direction == 't') { curRow--; }
-  else if(direction == 'l') { curCol--; }
-  else if(direction == 'r') { curCol++; }
-  else if(direction == 'b') { curRow++; }
+  c->rWall = val;
+}
 
-  return
-}*/
+extern void setbWall(CELL* c, int val)
+{
+  c->bWall = val;
+}
+
+extern void setStepNum(CELL* c, int val)
+{
+  c->stepNum = val;
+}
+
+extern void setNumBors(CELL* c, int val)
+{
+  c->numBors = val;
+}
+
+extern void setVisited(CELL* c, int val)
+{
+  c->visited = val;
+}
