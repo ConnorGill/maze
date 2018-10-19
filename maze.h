@@ -15,6 +15,7 @@
     extern void solveMaze(MAZE* m);
     extern void drawMaze(MAZE* m);
     extern CELL* updateIndex(MAZE* m, char direction);
+    extern void freeMaze(MAZE* m);
 
 
 #endif

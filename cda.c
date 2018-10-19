@@ -316,7 +316,15 @@ static void growArray(CDA *usrCDA)
 
 static void shrinkArray(CDA *usrCDA)
 {
-  int newCap = usrCDA->capacity / 2;
+  int newCap = 0;
+  if(usrCDA->capacity != 1)
+  {
+      newCap = usrCDA->capacity / 2;
+  }
+  else
+  {
+    newCap = usrCDA->capacity;
+  }
   void * (*temp) = malloc(sizeof(void*) * newCap);
   assert(temp != 0);
   for (int i = 0; i < sizeCDA(usrCDA); i++) { temp[i] = getCDA(usrCDA, i); }

@@ -39,8 +39,8 @@ amaze.o : maze.c maze.h cell.c cell.h stack.h
 	gcc $(OOPTS) amaze.c
 da-test2.o : da-test2.c da.h
 	gcc $(OOPTS) da-test2.c
-test-cda3.o : test-cda3.c cda.h
-	gcc $(OOPTS) test-cda3.c
+test-cda4.o : test-cda4.c cda.h
+	gcc $(OOPTS) test-cda4.c
 stack-test.o : stack-test.c stack.h da.h
 	gcc $(OOPTS) stack-test.c
 test-queue.o : test-queue.c queue.h cda.h
@@ -50,13 +50,13 @@ test : maze #da stack cda queue
 	#./cda
 	#./stack
 	#./queue
-	./amaze -r 2 -c 10 10 a.m -d a.m -s a.m b.m
-valgrind : maze da stack cda queue
+	./amaze -r 9397 -d ready.maze -s unready.maze ready.maze -c 33 24 unready.maze
+valgrind : amaze maze da stack cda queue
 	valgrind --leak-check=full ./da
 	valgrind --leak-check=full ./cda
 	valgrind --leak-check=full ./stack
 	valgrind --leak-check=full ./queue
-	valgrind --leak-check=full ./maze
+	valgrind --leak-check=full ./amaze
 clean :
 	rm -f $(DAOBJS) $(SOBJS) $(CDAOBJS) $(QOBJS) $(COBJS) $(MOBJS) \
 	da stack cda queue maze

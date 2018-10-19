@@ -212,7 +212,7 @@ extern MAZE * mazefromFile(char* mazeFile)
               // analyse res and process num
               setrWall(c, rWall);
               setbWall(c, bWall);
-              setStepNum(c, stepNum);
+              setstepNum(c, stepNum);
               setNumBors(c, numBors);
               setVisited(c, visited);
           }
@@ -245,8 +245,12 @@ extern void solveMaze(MAZE* m)
         setVisited(c, 0); //reset visited val to 0
         if (getrWall(c) == 0) //if no right wall
         {
-          setopenBors(c, 'r');
-          if(j != m->cols -1) //if far right col
+          if(getRow(c) != m->rows -1 || getCol(c) != m->cols -1)  //if not exit
+          {
+            setopenBors(c, 'r');  //set possible neigbors for path
+          }
+
+          if(j != m->cols -1) //if not far right col
           {
             CELL * tempCell = m->cellsArr[i][j+1];
             setopenBors(tempCell, 'l');
@@ -273,7 +277,7 @@ extern void solveMaze(MAZE* m)
   int currCol = 0;
 
   setVisited(currCell, 1);
-  setStepNum(currCell, currStep);
+  setstepNum(currCell, currStep);
 
   enqueue(path, currCell);
 
@@ -285,42 +289,88 @@ extern void solveMaze(MAZE* m)
 
     if (currRow == m->rows - 1 && currCol == m->cols -1)  //if exit cell
     {
-      setStepNum(currCell, stepNum % 10);
-      setVisited(currCell, 1);
+      currStep = getstepNum(currCell);
+      setstepNum(currCell, currStep % 10);
+      setVisited(currCell, 2);
+      //int n = 0;
+      while(sizeQUEUE(path) != 0)
+      {
+        CELL * leftover = (CELL *)dequeue(path); //cells leftover in QUEUE
+        if (getstepNum(leftover) == getstepNum(currCell))
+        {
+            setVisited(leftover, 2);
+        }
+
+      }
+      /*while(n < sizeQUEUE(path))  // TESTING
+      {
+        printf("CELL[%d][%d] - Visited = %d - Step# = %d\n", getRow(peekQUEUE(path)), getCol(peekQUEUE(path)), getVisited(peekQUEUE(path)), getstepNum(peekQUEUE(path)));
+        n++;
+
+      }*/
       break;
     }
 
     else
     {
-      if(getopenBor(currCell, 0) == 't')  //if up
+      int tempRow = getRow(currCell);
+      int tempCol = getCol(currCell);
+      if(getopenBor(currCell, 0) == 't')  //if up FIXME: MIGHT BE AN ISSUE W THE ORDER
       {
-        CELL * temp = m->cellsArr[0][0];
-        if (getVisited(currCell) == 0)
+        CELL * temp = m->cellsArr[tempRow -1][tempCol]; //set to next cell
+        if (getVisited(temp) == 0)
         {
-          setVisited(currCell, 1);
-          currStep = getstepNum(currCell) + 1;  //FIXME: Prob wrong
+          setVisited(temp, 1);
+          currStep = getstepNum(currCell) + 1;
+          setstepNum(temp, currStep % 10);
+          enqueue(path, temp);
         }
       }
 
       if(getopenBor(currCell, 3) == 'b')  //if down
       {
-
+        CELL * temp = m->cellsArr[tempRow + 1][tempCol]; //set to next cell
+        if (getVisited(temp) == 0)
+        {
+          setVisited(temp, 1);
+          currStep = getstepNum(currCell) + 1;
+          setstepNum(temp, currStep % 10);
+          enqueue(path, temp);
+        }
       }
 
       if(getopenBor(currCell, 1) == 'l')  //if left
       {
-
+        CELL * temp = m->cellsArr[tempRow][tempCol - 1]; //set to next cell
+        if (getVisited(temp) == 0)
+        {
+          setVisited(temp, 1);
+          currStep = getstepNum(currCell) + 1;
+          setstepNum(temp, currStep % 10);
+          enqueue(path, temp);
+        }
       }
 
-      if(getopenBor(currCell, 2) == 'r')  //if right
+      if(getopenBor(currCell, 2) == 'r')
       {
-
+        CELL * temp = m->cellsArr[tempRow][tempCol + 1]; //set to next cell
+        if (getVisited(temp) == 0)
+        {
+          setVisited(temp, 1);
+          currStep = getstepNum(currCell) + 1;
+          setstepNum(temp, currStep % 10);
+          //printf("CELLT[%d][%d] - Step#: %d - Visited: %d\n", getRow(temp), getCol(temp), getstepNum(temp), getVisited(temp));
+          enqueue(path, temp);
+        }
       }
+
+      setVisited(currCell, 2);
+
     }
 
 
   }
-
+  freeQUEUE(path);
 
 }
 
@@ -358,11 +408,26 @@ extern void drawMaze(MAZE* m)
       //printf("BWALL AT[%d][%d] = %d\n", i, j, getbWall(currCell));
       if (getrWall(currCell) == 1) //rWall exists
       {
-        printf("   |");
+        if(getstepNum(currCell) >= 0 && getVisited(currCell) == 2)
+        {
+          printf(" %d |", getstepNum(currCell));
+        }
+        else
+        {
+          printf("   |");
+        }
       }
       else if (getrWall(currCell) == 0) //no rWall
       {
-        printf("    ");
+        if(getstepNum(currCell) >= 0 && getVisited(currCell) == 2)
+        {
+            printf(" %d  ", getstepNum(currCell));
+        }
+        else
+        {
+          printf("    ");
+        }
+
       }
       if (getbWall(currCell) == 0) //remove bottom wall
       {
@@ -385,4 +450,21 @@ extern void drawMaze(MAZE* m)
     printf("\n");
 
   }
+}
+
+extern void freeMaze(MAZE* m)
+{
+  for (int i = 0; i < m->rows; i++)
+  {
+    for (int j = 0; j < m->cols; j++)
+    {
+      free(m->cellsArr[i][j]);
+    }
+  }
+  for (int i = 0; i < m->rows; i++)
+    {
+      free(m->cellsArr[i]);
+    }
+  free(m->cellsArr);
+  free(m);
 }

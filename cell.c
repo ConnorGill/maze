@@ -29,7 +29,7 @@ extern CELL   *newCELL(void)
   CELL * cellStruct = malloc(sizeof(CELL));  //allocates struct
   cellStruct->row = 0;
   cellStruct->col = 0;
-  cellStruct->stepNum = 0;
+  cellStruct->stepNum = -1;
   cellStruct->rWall = 1;
   cellStruct->bWall = 1;
   cellStruct->visited = 0;
@@ -305,7 +305,7 @@ extern void setbWall(CELL* c, int val)
   c->bWall = val;
 }
 
-extern void setStepNum(CELL* c, int val)
+extern void setstepNum(CELL* c, int val)
 {
   c->stepNum = val;
 }

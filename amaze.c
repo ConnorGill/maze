@@ -51,6 +51,7 @@ int main(int argc,char **argv)
     mazeFile = argv[create + 3];
     createMaze(m, rows, cols);
     mazetoFile(m, mazeFile); //store maze info in file
+    freeMaze(m);
   }
   if (solve)
   {
@@ -59,12 +60,14 @@ int main(int argc,char **argv)
     MAZE * m1 = mazefromFile(mazeFile);
     solveMaze(m1);
     mazetoFile(m1, solvedFile);
+    freeMaze(m1);
   }
   if (draw)
   {
     drawFile = argv[draw + 1];
     MAZE * m2 = mazefromFile(drawFile);
     drawMaze(m2);
+    freeMaze(m2);
   }
 
   //ProcessOptions(m,argc,argv);

@@ -26,7 +26,7 @@
     extern void setVisit(CELL* curr);
     extern void setrWall(CELL* c, int val);
     extern void setbWall(CELL* c, int val);
-    extern void setStepNum(CELL* c, int val);
+    extern void setstepNum(CELL* c, int val);
     extern void setNumBors(CELL* c, int val);
     extern void setVisited(CELL* c, int val);
 
