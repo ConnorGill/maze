@@ -298,7 +298,7 @@ extern void solveMaze(MAZE* m)
         CELL * leftover = (CELL *)dequeue(path); //cells leftover in QUEUE
         if (getstepNum(leftover) == getstepNum(currCell))
         {
-            setVisited(leftover, 2);
+            setVisited(leftover, 0);
         }
 
       }
@@ -318,18 +318,6 @@ extern void solveMaze(MAZE* m)
       if(getopenBor(currCell, 0) == 't')  //if up FIXME: MIGHT BE AN ISSUE W THE ORDER
       {
         CELL * temp = m->cellsArr[tempRow -1][tempCol]; //set to next cell
-        if (getVisited(temp) == 0)
-        {
-          setVisited(temp, 1);
-          currStep = getstepNum(currCell) + 1;
-          setstepNum(temp, currStep % 10);
-          enqueue(path, temp);
-        }
-      }
-
-      if(getopenBor(currCell, 3) == 'b')  //if down
-      {
-        CELL * temp = m->cellsArr[tempRow + 1][tempCol]; //set to next cell
         if (getVisited(temp) == 0)
         {
           setVisited(temp, 1);
@@ -363,6 +351,19 @@ extern void solveMaze(MAZE* m)
           enqueue(path, temp);
         }
       }
+
+      if(getopenBor(currCell, 3) == 'b')  //if down
+      {
+        CELL * temp = m->cellsArr[tempRow + 1][tempCol]; //set to next cell
+        if (getVisited(temp) == 0)
+        {
+          setVisited(temp, 1);
+          currStep = getstepNum(currCell) + 1;
+          setstepNum(temp, currStep % 10);
+          enqueue(path, temp);
+        }
+      }
+
 
       setVisited(currCell, 2);
 

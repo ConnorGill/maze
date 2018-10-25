@@ -50,7 +50,9 @@ test : maze #da stack cda queue
 	#./cda
 	#./stack
 	#./queue
-	./amaze -r 9397 -d ready.maze -s unready.maze ready.maze -c 33 24 unready.maze
+	#./amaze -r 9397 -d ready.maze -s unready.maze ready.maze -c 33 24 unready.maze
+	./amaze -r 7600 -s unready.maze ready.maze -c 63 14 unready.maze -d ready.maze
+	#testdir-amaze-stack/amaze -r 7600 -s unready.maze ready.maze -c 63 14 unready.maze -d ready.maze
 valgrind : amaze maze da stack cda queue
 	valgrind --leak-check=full ./da
 	valgrind --leak-check=full ./cda
